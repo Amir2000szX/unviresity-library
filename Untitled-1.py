@@ -26,7 +26,7 @@ class Library:
         with open(self.file_path, "a") as libfile:
             libfile.write(f"{self.__books[-1].name}_{self.__books[-1].release_year}_{self.__books[-1].authors}_{self.__books[-1].key}\n")
 
-# Example usage
+
 book1 = Book("Alchemist", 2019, "David")
 book2 = Book("Me Before You", 2020, "Jojo")
 markazi = Library("Markazi", "Near the Department of Mathematics", [book1, book2])
