@@ -9,24 +9,24 @@ class Book:
         self.key = Book.count
         Book.count +=1
 class Library:
-    
-    def __init__(self, name: str, address: str, start_books: List[Book]):
+    Liblist = []
+    def __init__(self, name: str, address: str, start_books: List[Book]=[]):
         self.name = name
         self.address = address
-        self.__books = start_books
-        
+        self.books = start_books
+        Library.Liblist.append((self.name,self.address))
         
         self.file_path = f"C:/Users/hiva laptop/Desktop/project/lib_{self.name}.txt"
         with open(self.file_path, "w+") as libfile:
-            for book in self.__books:
+            for book in self.books:
                 libfile.write(f"{book.name}_{book.release_year}_{book.authors}_{book.key}\n")
 
     def add_new_book(self, book: Book):
-        self.__books.append(book)
+        self.books.append(book)
         with open(self.file_path, "a") as libfile:
-            libfile.write(f"{self.__books[-1].name}_{self.__books[-1].release_year}_{self.__books[-1].authors}_{self.__books[-1].key}\n")
+            libfile.write(f"{self.books[-1].name}_{self.books[-1].release_year}_{self.books[-1].authors}_{self.books[-1].key}\n")
 
 
-book1 = Book("Alchemist", 2019, "David")
-book2 = Book("Me Before You", 2020, "Jojo")
-markazi = Library("Markazi", "Near the Department of Mathematics", [book1, book2])
+
+lib1 = Library("azadegan","khabgah")
+print(Library.Liblist)
