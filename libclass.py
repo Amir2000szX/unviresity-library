@@ -1,5 +1,5 @@
 from typing import List
-
+import os 
 class Book:
     count = 1
     def __init__(self, name: str, release_year: int, authors: str):
@@ -14,12 +14,19 @@ class Library:
         self.name = name
         self.address = address
         self.books = start_books
+        
         Library.Liblist.append((self.name,self.address))
         
-        self.file_path = f"C:/Users/hiva laptop/Desktop/project/lib_{self.name}.txt"
-        with open(self.file_path, "w+") as libfile:
-            for book in self.books:
-                libfile.write(f"{book.name}_{book.release_year}_{book.authors}_{book.key}\n")
+        self.file_path = f"C:/Users/hiva laptop/Desktop/project/library/lib_{self.name}.txt"
+        libraries = os.listdir(self.file_path)
+        for nameFile in libraries :
+            if f"lib_{self.name}.txt" == nameFile:
+                print("library exists")
+                break
+            else:
+                with open(self.file_path, "w+") as libfile:
+                    for book in self.books:
+                        libfile.write(f"{book.name}_{book.release_year}_{book.authors}_{book.key}\n")
 
     def add_new_book(self, book: Book):
         self.books.append(book)
