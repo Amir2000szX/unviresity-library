@@ -7,7 +7,7 @@ def addLib():
         lib = Library(name, address)
         file_path = f"C:/Users/hiva laptop/Desktop/project/library/lib_{lib.name}.txt"
         with open(file_path, "w") as libfile:  # Changed to "w" for creating a new file
-            addBook(lib.name, count.get(), 0)  # Start adding books with the initial count
+            addBook(0, count.get())  # Start adding books with the initial count
         window.destroy()
 
     new_window = Toplevel(root)
@@ -36,10 +36,10 @@ def addLib():
     submit = Button(new_window, text="Add", command=lambda: library(name_var.get(), address_var.get(), bookcount, new_window))
     submit.grid(column=1, row=4, pady=15)
 
-def addBook( total_books, current_book):
+def addBook(total_books, current_book):
     def submit(name: str, release_year: int, authors: str, window: Toplevel,library_name:StringVar):
         book = Book(name, release_year, authors)
-        file_path = f"C:/Users/hiva laptop/Desktop/project/library/lib_{library_name.get()}.txt"
+        file_path = f"C:/Users/hiva laptop/Desktop/project/library/{library_name.get()}"
         with open(file_path, "a") as library:
             library.write(f"{book.name}_{book.release_year}_{book.authors}_{book.key}\n")
         window.destroy()
@@ -58,45 +58,99 @@ def addBook( total_books, current_book):
 
     nameLabel = Label(new_window, text="Name of the Book",font=("arial",12))
     nameLabel.grid(column=0, row=0, pady=10)
-    nameEntry = Entry(new_window, width=50, textvariable=name_var,font=("arial",10))
+    nameEntry = Entry(new_window, width=40, textvariable=name_var,font=("arial",10))
     nameEntry.grid(column=1, row=0, pady=10)
 
     yearLabel = Label(new_window, text="Release Year of Book",font=("arial",12))
     yearLabel.grid(column=0, row=2, pady=10)
-    yearEntry = Entry(new_window, width=50, textvariable=release_var,font=("arial",10))
+    yearEntry = Entry(new_window, width=40, textvariable=release_var,font=("arial",10))
     yearEntry.grid(column=1, row=2, pady=10)
 
     authorLabel = Label(new_window, text="Author of the Book",font=("arial",12))
     authorLabel.grid(column=0, row=3, pady=10)
-    authorEntry = Entry(new_window, textvariable=author_var, width=50,font=("arial",10))
+    authorEntry = Entry(new_window, textvariable=author_var, width=40,font=("arial",10))
     authorEntry.grid(column=1, row=3, pady=10)
     
     comboLabel = Label(new_window, text="which library:",font=("arial",15))
     comboLabel.grid(column=1, row=4, pady=10)
     
 
-    libraries = []
-    for i in range(len(Library.Liblist)):
-        libraries.append(Library.Liblist[i][0])
+    filepath = r"C:\Users\hiva laptop\Desktop\project\library"
+    libraries = os.listdir(filepath)
 
     comboLib = Combobox(new_window,textvariable=combo_var,width=25)
     comboLib['values']=tuple(libraries)
     comboLib.grid(column=1,row=5)
-    comboLib.current()
+    comboLib.current(0)
 
     submitBut = Button(new_window, text="Submit", command=lambda: submit(name_var.get(), release_var.get(), author_var.get(), new_window,combo_var))
     submitBut.grid(column=1, row=6, pady=15)
 
 def delLib():
+    def delete(combovar:StringVar):
+        path = r"C:\Users\hiva laptop\Desktop\project\library"
+        newpath = os.path.join(path,combovar.get())
+        os.remove(newpath)
     new_window = Toplevel(root)
     new_window.title("Delete Library")
     new_window.geometry("300x200")
 
+    combovar = StringVar()
+
+    labelDel = Label(new_window,font=("Arial" , 15),text="the library you want to delete :")
+    labelDel.grid(column=0,row=0,pady=10,padx=15)
+    booklist = os.listdir(r"C:\Users\hiva laptop\Desktop\project\library")
+
+    comboDel = Combobox(new_window,textvariable=combovar,values=booklist,width=30)
+    comboDel.grid(column=0,row=1,padx=15)
+    combovar.set(booklist[0])
+    
+    delBtn = Button(new_window,text="delete",command=lambda:delete(combovar=combovar))
+    delBtn.grid(column=0,row=2,sticky="EW",pady=10)
 def delBook():
+    def delete(namevar:StringVar,libvar:StringVar):
+        newpath = filepath + "\\"+ libvar.get()
+        try :
+            with open(newpath,"r") as file :
+                lines = file.readlines()
+        except :
+            raise FileNotFoundError
+        try :
+            for i in range(len(lines)):
+                firstpart = lines[i].find("_")
+                if lines[i][0:firstpart] == namevar.get():
+                    del lines[i]
+                    break
+            with open(newpath,"w") as file :
+                file.writelines(lines)
+            
+        except:
+            raise "it can not delete the book"
     new_window = Toplevel(root)
     new_window.title("Delete Book")
-    new_window.geometry("300x200")
+    new_window.geometry("450x230")
 
+    name = StringVar()
+    combovar = StringVar()
+
+    nameLabel = Label(new_window, text="name of the book you want to delete",font=("arial",12))
+    nameLabel.grid(column=0, row=0, pady=10)
+    nameEntry = Entry(new_window, width=25, textvariable=name,font=("arial",10))
+    nameEntry.grid(column=1, row=0, pady=10)
+
+    filepath = r"C:\Users\hiva laptop\Desktop\project\library"
+    libraries = os.listdir(filepath)
+
+    libLabel = Label(new_window, text="name of the library : ",font=("arial",12))
+    libLabel.grid(column=0, row=1, pady=10)
+
+    comboLib = Combobox(new_window,textvariable=combovar,width=25)
+    comboLib['values']=tuple(libraries)
+    comboLib.grid(column=1,row=1)
+    comboLib.current(0)
+
+    delBut = Button(new_window,text="delete",command=lambda:delete(name,combovar))
+    delBut.grid(column=1,row=2)
 def changeBook():
     
 
@@ -106,7 +160,7 @@ def changeBook():
         with open(file_path, "r") as file:
             lineList = file.readlines()
     
-    # Flags to track if updates were made
+    
         name_updated = False
         release_updated = False
         author_updated = False
@@ -115,13 +169,13 @@ def changeBook():
             firstpart = lineList[i].find("_")
         
             if firstpart != -1 and name == lineList[i][0:firstpart]:
-                # Update the name if newName is provided
+                
                 if newName.get() != "":
                     lineList[i] = newName.get() + lineList[i][firstpart:]
                     name_updated = True
             
-            # Update the release year if newRelease is provided
-                if newRelease.get() != "":
+            
+                if newRelease.get() != 0:
                     secondpart = lineList[i].find("_", firstpart + 1)
                     if secondpart != -1:
                         parts = lineList[i].split("_")
@@ -129,7 +183,7 @@ def changeBook():
                         lineList[i] = "_".join(parts)
                         release_updated = True
             
-            # Update the author if newAuthor is provided
+            
                 if newAuthor.get() != "":
                     secondpart = lineList[i].find("_", firstpart + 1)
                     if secondpart != -1:
@@ -138,14 +192,14 @@ def changeBook():
                             lineList[i] = lineList[i][:secondpart + 1] + newAuthor.get() + lineList[i][thirdpart:]
                             author_updated = True
         
-        # If at least one update is made, break the loop
+        
             if name_updated or release_updated or author_updated:
                 break
     
         with open(file_path, "w") as file:
             file.writelines(lineList)
 
-    # Print update status
+    
         if name_updated:
             print("Name updated successfully.")
         if release_updated:
@@ -154,7 +208,7 @@ def changeBook():
             print("Author updated successfully.")
         if not (name_updated or release_updated or author_updated):
             print("No matching line found or no updates made.")
- 
+    
 
     new_window = Toplevel(root)
     new_window.title("Change Book")
@@ -186,15 +240,14 @@ def changeBook():
     nameLabel.grid(column=0, row=3, pady=10)
     nameEntry = Entry(new_window, width=35, textvariable=new_author,font=("arial",10))
     nameEntry.grid(column=1, row=3, pady=10)
-
-    libraries = []
-    for i in range(len(Library.Liblist)):
-        libraries.append(Library.Liblist[i][0])
+    
+    filepath = r"C:\Users\hiva laptop\Desktop\project\library"
+    libraries = os.listdir(filepath)
 
     comboLib = Combobox(new_window,textvariable=combo_var,width=25)
     comboLib['values']=tuple(libraries)
     comboLib.grid(column=1,row=4)
-    comboLib.current()
+    comboLib.current(0)
 
     butfind = Button(new_window,text="find",command=lambda:find(name_var.get(),comboLib,new_name,new_release,new_author))
     butfind.grid(column=1,row=5)
@@ -202,12 +255,74 @@ def changeBook():
 
 
 def show():
+    def appear(libvar:StringVar):
+        newpath = filepath + "\\"+ libvar.get()
+        try :
+            with open(newpath,"r") as file :
+                lines = file.readlines()
+        except :
+            raise FileNotFoundError
+        show_window = Toplevel(new_window)
+        show_window.title("show")
+        show_window.geometry("600x600")
+
+        frame1 = Frame(show_window)
+        frame1.pack(expand=1,fill=BOTH)
+
+        canvas1 = Canvas(frame1)
+        canvas1.pack(side=LEFT,expand=1,fill=BOTH)
+
+        scroll = Scrollbar(frame1,orient=VERTICAL,command=canvas1.yview,)
+        scroll.pack(side=RIGHT,fill='y')
+
+        canvas1.configure(yscrollcommand=scroll.set)
+        canvas1.bind('<Configure>',lambda e:canvas1.configure(scrollregion=canvas1.bbox("all")))
+
+        insdideCanvas = Canvas(canvas1)
+        canvas1.create_window(0,0,window=insdideCanvas)
+
+        namelbl = Label(insdideCanvas,text="name",font=("halvetica",18))
+        namelbl.grid(column=0,row=0,sticky='ew',pady=15,padx=10)
+        yearlbl = Label(insdideCanvas,text="year",font=("halvetica",18))
+        yearlbl.grid(column=1,row=0,sticky='ew',pady=15,padx=10)
+        authorlbl = Label(insdideCanvas,text="author",font=("halvetica",18))
+        authorlbl.grid(column=2,row=0,sticky='ew',pady=15,padx=10)
+        indexlbl = Label(insdideCanvas,text="index",font=("halvetica",18))
+        indexlbl.grid(column=3,row=0,sticky='e',pady=15,padx=10)
+
+        for i in range(len(lines)):
+            firstpart = lines[i].find("_")
+            secondpart = lines[i].find("_",firstpart+1)
+            thirdpart  = lines[i].find("_",secondpart+1)
+            fourthpart = lines[i].find("_",thirdpart+1)
+
+            Label(insdideCanvas,text=f"{lines[i][0:firstpart]}",font=("arial",10)).grid(column=0,row=i+1)
+            Label(insdideCanvas,text=f"{lines[i][firstpart+1:secondpart]}",font=("arial",10)).grid(column=1,row=i+1,padx=10,pady=15)
+            Label(insdideCanvas,text=f"{lines[i][secondpart+1:thirdpart]}",font=("arial",10)).grid(column=2,row=i+1,padx=10,pady=15)
+            Label(insdideCanvas,text=f"{lines[i][thirdpart+1:fourthpart]}",font=("arial",10)).grid(column=3,row=i+1,padx=10,pady=15)
+
     new_window = Toplevel(root)
     new_window.title("Show Data")
-    new_window.geometry("300x200")
+    new_window.geometry("330x230")
+
+    combovar = StringVar()
+
+    nameLabel = Label(new_window, text="name of the Library",font=("arial",15))
+    nameLabel.grid(column=0, row=0, pady=10)
+
+    filepath = r"C:\Users\hiva laptop\Desktop\project\library"
+    libraries = os.listdir(filepath)
+
+    comboLib = Combobox(new_window,textvariable=combovar,width=25)
+    comboLib['values']=tuple(libraries)
+    comboLib.grid(column=1,row=1)
+    comboLib.current(0)
+
+    showBut = Button(new_window,text="Show",command=lambda:appear(libvar=combovar))
+    showBut.grid(column=1,row=2)
 
 root = Tk()
-root.geometry("400x300")
+root.geometry("430x360")
 frame = Frame(root, padding=10)
 frame.grid(row=0, column=0, sticky="nsew")
 
